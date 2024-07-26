@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./globals.css";
-import Form from "./components/form";
+import Button from "./components/Button/Button";
+import InputField from "./components/InputField/inputField";
+import Form from "./components/Form/form";
+
 
 export default function Home() {
   const [message, setMessage] = useState("");
@@ -26,12 +29,8 @@ export default function Home() {
     <div>
       <h1>Hello world</h1>
       <Form />
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-        onClick={handleClick}
-      >
-        Click Me
-      </button>
+      <InputField type="number"/>
+      <Button type="submit" text="Submit" onClick={handleClick}/>
     </div>
   );
 }

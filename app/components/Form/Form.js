@@ -1,4 +1,6 @@
 import React from "react";
+import InputField from "../InputField/inputField";
+import Button from "../Button/Button";
 
 function Form() {
   const handleSubmit = (e) => {
@@ -8,8 +10,8 @@ function Form() {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <input placeholder="testing"/>
-        <button type="submit">submit</button>
+        <InputField />
+        <Button text="Submit"/>
       </form>
     </div>
   );
