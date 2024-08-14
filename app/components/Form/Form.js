@@ -9,10 +9,10 @@ function Form() {
   };
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      {/* <form onSubmit={handleSubmit}>
         <InputField />
         <Button text="Submit"/>
-      </form>
+      </form> */}
     </div>
   );
 }
