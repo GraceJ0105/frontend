@@ -4,9 +4,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./globals.css";
 import Button from "./components/Button/Button";
-// import InputField from "./components/InputField/inputField";
-// import Form from "./components/Form/form";
-
 
 export default function Home() {
   const [message, setMessage] = useState("");
@@ -22,16 +19,16 @@ export default function Home() {
   };
 
   const handleClick = () => {
+    event.preventDefault()
     fetchData();
   };
 
   return (
     <div>
-      <h1>Hello world</h1>
-      {/* <Form /> */}
-      {/* <InputField type="number"/> */}
-      <h2>Checking backend connection</h2>
-      <Button type="submit" text="Submit" onClick={handleClick}/>
+      <form onClick={handleClick}>
+        <input type="number" />
+        <input type="submit" value="Submit" />
+      </form>
     </div>
   );
 }
