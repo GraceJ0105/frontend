@@ -148,7 +148,7 @@ export default function Home() {
             <label> Broad Habitat</label>
             <Dropdown>
               <DropdownTrigger>
-                <Button variant="bordered" class="ml-5">
+                <Button variant="bordered" className="ml-5">
                   {broadHabitat}
                 </Button>
               </DropdownTrigger>
@@ -169,7 +169,7 @@ export default function Home() {
             <label>Habitat Type</label>
             <Dropdown>
               <DropdownTrigger>
-                <Button variant="bordered" class="ml-5">
+                <Button variant="bordered" className="ml-5">
                   {habitatTypeDropdown || "Select"}
                 </Button>
               </DropdownTrigger>
@@ -189,7 +189,7 @@ export default function Home() {
           <label>Condition</label>
           <Dropdown>
             <DropdownTrigger>
-              <Button variant="bordered" class="ml-5">
+              <Button variant="bordered" className="ml-5">
                 {selectedConditionOption || "Select"}
               </Button>
             </DropdownTrigger>
@@ -208,7 +208,7 @@ export default function Home() {
           <label>Strategic Significance</label>
           <Dropdown>
             <DropdownTrigger>
-              <Button variant="bordered" class="ml-5">
+              <Button variant="bordered" className="ml-5">
                 {selectedStrategicSignificance || "Select"}
               </Button>
             </DropdownTrigger>
@@ -223,7 +223,7 @@ export default function Home() {
           </Dropdown>
         </div>
       </form>
-      <form class="mt-3" onSubmit={sendNumber}>
+      <form className="mt-3" onSubmit={sendNumber}>
         <label>Area (hectares)</label>
         <input
           type="text"
@@ -243,8 +243,8 @@ export default function Home() {
       {message && <p>{message}</p>}
 
       {/* to be calculated in backend using input from users */}
-      <h2 class="font-bold mt-3">Distinctiveness</h2>
-      <h3 class="mt-3">Distinctiveness</h3>
+      <h2 className="font-bold mt-3">Distinctiveness</h2>
+      <h3 className="mt-3">Distinctiveness</h3>
       <h3>Score</h3>
     </div>
   );
