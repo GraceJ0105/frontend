@@ -11,6 +11,9 @@ export default function Home() {
   const [habitatType, setHabitatType] = useState(null);
   const [condition, setCondition] = useState(null);
   const [strategicSignificance, setStrategicSignificance] = useState(null);
+  const [distinctiveness, setDistinctiveness] = useState("");
+  const [distinctivenessScore, setDistinctivenessScore] = useState(0)
+  
 
   const broadHabitatOptions = [
     { value: "Cropland", label: "Cropland" },
@@ -90,16 +93,18 @@ export default function Home() {
 
   const strategicSignificanceOptions = [
     {
-      value: "High strategic significance",
-      label: "High strategic significance",
+      value: "Formally identified in local strategy (High)",
+      label: "Formally identified in local strategy (High)",
     },
     {
-      value: "Medium strategic significance",
-      label: "Medium strategic significance",
+      value:
+        "Location ecologically desirable but not in local strategy (Medium)",
+      label:
+        "Location ecologically desirable but not in local strategy (Medium)",
     },
     {
-      value: "Low strategic significance",
-      label: "Low strategic significance",
+      value: "Area/compensation not in local strategy/ no local strategy (Low)",
+      label: "Area/compensation not in local strategy/ no local strategy (Low)",
     },
   ];
 
@@ -110,34 +115,32 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = {
-      area: parseFloat(value),
-      broadHabitat: broadHabitat?.value,
-      habitatType: habitatType?.value,
-      condition: condition?.value,
-      strategicSignificance: strategicSignificance?.value,
-    };
-    console.log(data);
 
     try {
-    const response = await fetch("/api/calculate", {
-      
+    const response = await fetch("/api/calculateDistinctivenessScore", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data), 
+      body: JSON.stringify({
+        broadHabitat: broadHabitat?.value,
+        habitatType: habitatType?.value,
+      }),
     });
 
     if (!response.ok) {
       throw new Error("Failed to communicate with backend");
     }
 
-    const result = await response.text();
-    setMessage(result);
+    const data = await response.json();
+    console.log("Received data: ", data)
+    setDistinctivenessScore(data.distinctivenessScore);
+    setDistinctiveness(data.distinctivenessCategory)
+
   } catch (error) {
     console.error("Error:", error);
-    setMessage("An error occurred");
+    setMessage("An error occurred: ", error);
+    alert(message)
   }
 
   };
@@ -175,6 +178,28 @@ export default function Home() {
               />
             </div>
           )}
+          <div>
+            <h1 className="text-gray-700 mb-2 block">Distinctiveness</h1>
+            <div className=" grid grid-cols-2">
+              {" "}
+              <div>
+                <h2 className="text-gray-500 mb-2">Distinctiveness</h2>
+                <input
+                  className="w-1/2 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+                  value={distinctiveness}
+                  disabled
+                />
+              </div>
+              <div>
+                <h2 className="text-gray-500 mb-2">Distinctiveness Score</h2>
+                <input
+                  className="w-1/4 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+                  value={distinctivenessScore}
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Condition */}
           <div>

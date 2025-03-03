@@ -5,7 +5,7 @@ export async function POST(request) {
     const { baselineAreaValue } = await request.json();
 
     const backendResponse = await fetch(
-      "http://localhost:3030/distinctiveness",
+      "http://localhost:3030/calculateBaseline",
       {
         method: "POST",
         headers: {
