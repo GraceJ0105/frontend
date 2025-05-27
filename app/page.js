@@ -152,7 +152,9 @@ const getConditionOptions = (selectedOption) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     getDistinctivenessScore()
+    if(conditionOptionsAvailable){
     getConditionScore()
+    }
   };
 
   const getDistinctivenessScore = async ()=> {
@@ -212,8 +214,6 @@ try {
       setMessage("An error occurred: ", error);
       alert(message);
     }
-  } else {
-    setConditionScore(1); // Default score for "Condition Assessment N/A"
   }
   }
 
@@ -246,7 +246,7 @@ try {
                 value={habitatType}
                 onChange={(selectedOption) => {
                   setHabitatType(selectedOption);
-                  getConditionOptions(selectedOption);
+                  getConditionOptions(selectedOption);  
                 }}
                 placeholder="Select Habitat Type"
                 className="text-gray-700"
