@@ -13,7 +13,15 @@ export default function Home() {
   const [strategicSignificance, setStrategicSignificance] = useState(null);
   const [distinctiveness, setDistinctiveness] = useState("");
   const [distinctivenessScore, setDistinctivenessScore] = useState(0)
-  
+  const [conditionScore, setConditionScore] = useState(0);
+  const [conditionOptionsAvailable, setConditionOptionsAvailable] = useState(true)
+  const [conditionOptions, setConditionOptions] = useState([
+    { value: "Good", label: "Good" },
+    { value: "Fairly Good", label: "Fairly Good" },
+    { value: "Moderate", label: "Moderate" },
+    { value: "Fairly Poor", label: "Fairly Poor" },
+    { value: "Poor", label: "Poor" },
+  ]);
 
   const broadHabitatOptions = [
     { value: "Cropland", label: "Cropland" },
@@ -83,13 +91,41 @@ export default function Home() {
     ],
   };
 
-  const conditionOptions = [
-    { value: "Good", label: "Good" },
-    { value: "Fairly Good", label: "Fairly Good" },
-    { value: "Moderate", label: "Moderate" },
-    { value: "Fairly Poor", label: "Fairly Poor" },
-    { value: "Poor", label: "Poor" },
-  ];
+   const restrictedConditionHabitats = [
+     "Arable field margins cultivated annually",
+     'Arable field margins game bird mix',
+     'Arable field margins pollen and nectar',
+     'Arable field margins tussocky',
+     "Cereal crops",
+     "Horticulture",
+     "Winter stubble",
+     "Intensive orchards",
+     "Non-cereal crops",
+     "Temporary grass and clover leys",
+     "Bracken",
+   ];
+
+const getConditionOptions = (selectedOption) => {
+  console.log("Inside getConditionOptions: ", selectedOption)
+  if (selectedOption && restrictedConditionHabitats.includes(selectedOption.value)) {
+    setConditionOptionsAvailable(false)
+    setConditionScore(1);
+    setConditionOptions([
+      { value: "Condition Assessment N/A", label: "Condition Assessment N/A" },
+    ]);
+    
+  } else {
+    setConditionOptionsAvailable(true)
+    setConditionOptions([
+      { value: "Good", label: "Good" },
+      { value: "Fairly Good", label: "Fairly Good" },
+      { value: "Moderate", label: "Moderate" },
+      { value: "Fairly Poor", label: "Fairly Poor" },
+      { value: "Poor", label: "Poor" },
+    ]);
+    setConditionScore(0);
+  }
+};
 
   const strategicSignificanceOptions = [
     {
@@ -115,8 +151,14 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    getDistinctivenessScore()
+    if(conditionOptionsAvailable){
+    getConditionScore()
+    }
+  };
 
-    try {
+  const getDistinctivenessScore = async ()=> {
+try {
     const response = await fetch("/api/calculateDistinctivenessScore", {
       method: "POST",
       headers: {
@@ -142,8 +184,38 @@ export default function Home() {
     setMessage("An error occurred: ", error);
     alert(message)
   }
+  }
 
-  };
+  const getConditionScore = async () => {
+  console.log(condition);
+  if (condition?.value !== "Condition Assessment N/A") {
+    try {
+      const response = await fetch("/api/calculateConditionScore", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          condition: condition?.value,
+          broadHabitat: broadHabitat?.value,
+          habitatType: habitatType?.value,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to communicate with backend");
+      }
+
+      const data = await response.json();
+      console.log("Received data: ", data);
+      setConditionScore(data.conditionScore);
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage("An error occurred: ", error);
+      alert(message);
+    }
+  }
+  }
 
   return (
     <div className="flex justify-center items-start w-full min-h-screen bg-gray-100 p-6">
@@ -172,12 +244,16 @@ export default function Home() {
               <Select
                 options={habitatTypeOptions[broadHabitat.value]}
                 value={habitatType}
-                onChange={(selectedOption) => setHabitatType(selectedOption)}
+                onChange={(selectedOption) => {
+                  setHabitatType(selectedOption);
+                  getConditionOptions(selectedOption);  
+                }}
                 placeholder="Select Habitat Type"
                 className="text-gray-700"
               />
             </div>
           )}
+          {/* Distinctiveness */}
           <div>
             <h1 className="text-gray-700 mb-2 block">Distinctiveness</h1>
             <div className=" grid grid-cols-2">
@@ -203,16 +279,51 @@ export default function Home() {
 
           {/* Condition */}
           <div>
-            <label className="text-gray-700 mb-2 block">Condition</label>
-            <Select
-              options={conditionOptions}
-              value={condition}
-              onChange={(selectedOption) => setCondition(selectedOption)}
-              placeholder="Select Condition"
-              className="text-gray-700"
-            />
+            <h1 className="text-gray-700 mb-2 block">Condition</h1>
+            {conditionOptionsAvailable ? (
+              <div className=" grid grid-cols-2">
+                <div>
+                  <label className="text-gray-500 mb-2">Condition</label>
+                  <Select
+                    options={conditionOptions}
+                    value={condition}
+                    onChange={(selectedOption) => setCondition(selectedOption)}
+                    placeholder="Select Condition"
+                    className="w-11/12 pt-3 text-gray-700"
+                  />
+                </div>
+                <div>
+                  <h2 className="text-gray-500 mb-2">Condition Score</h2>
+                  <input
+                    className="w-1/4 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+                    value={conditionScore}
+                    disabled
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className=" grid grid-cols-2">
+                  <div>
+                  <label className="text-gray-500 mb-2">Condition</label>
+                  <input
+                    value="Condition Assessment N/A"
+                    className="w-11/12 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+                    disabled
+                  />
+                  </div>
+                  <div>
+                  <h2 className="text-gray-500 mb-2">Condition Score</h2>
+                  <input
+                    className="w-1/4 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+                    value={conditionScore}
+                    disabled
+                  />
+                </div>
+                </div>
+              </div>
+            )}
           </div>
-
           {/* Strategic Significance */}
           <div>
             <label className="text-gray-700 mb-2 block">
