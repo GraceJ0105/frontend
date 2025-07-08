@@ -2,16 +2,16 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const { baselineAreaValue } = await request.json();
+    const { area } = await request.json();
 
     const backendResponse = await fetch(
-      "http://localhost:3030/calculateBaseline",
+      "http://localhost:3030/baselineScore",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ baselineAreaValue }), 
+        body: JSON.stringify({ area }), 
       }
     );
 
@@ -22,9 +22,11 @@ export async function POST(request) {
       );
     }
 
-    const backendData = await backendResponse.text(); 
+     const data = await backendResponse.json();
 
-    return NextResponse.json(backendData, { status: 200 });
+     const { baselineScore } = data;
+
+    return NextResponse.json({baselineScore}, { status: 200 });
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });

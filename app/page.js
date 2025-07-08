@@ -5,7 +5,8 @@ import Select from "react-select";
 import Link from "next/link";
 
 export default function Home() {
-  const [value, setValue] = useState("");
+  const [area, setArea] = useState(null);
+  const [baselineScore, setBaselineScore] = useState(null);
   const [message, setMessage] = useState("");
   const [broadHabitat, setBroadHabitat] = useState(null);
   const [habitatType, setHabitatType] = useState(null);
@@ -129,17 +130,17 @@ const getConditionOptions = (selectedOption) => {
 
   const strategicSignificanceOptions = [
     {
-      value: "Formally identified in local strategy (High)",
+      value: "High",
       label: "Formally identified in local strategy (High)",
     },
     {
       value:
-        "Location ecologically desirable but not in local strategy (Medium)",
+        "Medium",
       label:
         "Location ecologically desirable but not in local strategy (Medium)",
     },
     {
-      value: "Area/compensation not in local strategy/ no local strategy (Low)",
+      value: "Low",
       label: "Area/compensation not in local strategy/ no local strategy (Low)",
     },
   ];
@@ -155,7 +156,35 @@ const getConditionOptions = (selectedOption) => {
     if(conditionOptionsAvailable){
     getConditionScore()
     }
+    getBaselineValue()
   };
+
+  const getBaselineValue = async () => {
+    try {
+      const response = await fetch("/api/calculateBaseline", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          area: area?.value
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to communicate with backend");
+      }
+
+      const data = await response.json();
+      console.log("Received data: ", data);
+      setBaselineScore(data.baselineScore);
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage("An error occurred: ", error);
+      alert(message);
+    }
+  };
+
 
   const getDistinctivenessScore = async ()=> {
 try {
@@ -220,14 +249,15 @@ try {
   return (
     <div className="flex justify-center items-start w-full min-h-screen bg-gray-100 p-6">
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-2xl">
-        <Link href="/HomePage/" className="text-blue-500 hover:underline">
-          Home
-        </Link>
-
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
           {/* Broad Habitat */}
           <div>
-            <label className="text-gray-700 mb-2 block">Broad Habitat</label>
+            <label
+              className="text-gray-700 mb-2 block"
+              data-cy="broad-habitat-dropdown"
+            >
+              Broad Habitat
+            </label>
             <Select
               options={broadHabitatOptions}
               value={broadHabitat}
@@ -240,16 +270,22 @@ try {
           {/* Habitat Type */}
           {broadHabitat && (
             <div>
-              <label className="text-gray-700 mb-2 block">Habitat Type</label>
+              <label
+                className="text-gray-700 mb-2 block"
+                data-cy="habitat-type-dropdown"
+              >
+                Habitat Type
+              </label>
               <Select
                 options={habitatTypeOptions[broadHabitat.value]}
                 value={habitatType}
                 onChange={(selectedOption) => {
                   setHabitatType(selectedOption);
-                  getConditionOptions(selectedOption);  
+                  getConditionOptions(selectedOption);
                 }}
                 placeholder="Select Habitat Type"
                 className="text-gray-700"
+                data-cy="broad-habitat-selection"
               />
             </div>
           )}
@@ -305,21 +341,21 @@ try {
               <div>
                 <div className=" grid grid-cols-2">
                   <div>
-                  <label className="text-gray-500 mb-2">Condition</label>
-                  <input
-                    value="Condition Assessment N/A"
-                    className="w-11/12 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
-                    disabled
-                  />
+                    <h2 className="text-gray-500 mb-2">Condition</h2>
+                    <input
+                      value="Condition Assessment N/A"
+                      className="w-11/12 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+                      disabled
+                    />
                   </div>
                   <div>
-                  <h2 className="text-gray-500 mb-2">Condition Score</h2>
-                  <input
-                    className="w-1/4 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
-                    value={conditionScore}
-                    disabled
-                  />
-                </div>
+                    <h2 className="text-gray-500 mb-2">Condition Score</h2>
+                    <input
+                      className="w-1/4 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+                      value={conditionScore}
+                      disabled
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -345,17 +381,24 @@ try {
             <label className="text-gray-700 mb-2 block">Area (hectares)</label>
             <input
               type="text"
-              value={value}
+              value={area}
               onChange={(e) => {
                 const regex = /^[0-9]*\.?[0-9]*$/;
                 if (regex.test(e.target.value) || e.target.value === "") {
-                  setValue(e.target.value);
+                  setArea(e.target.value);
                 }
               }}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-400"
             />
           </div>
-
+          <div>
+            <h2 className="text-gray-700 mb-2 block">BNG Baseline Score</h2>
+            <input
+              className="w-1/4 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
+              value={baselineScore}
+              disabled
+            />
+          </div>
           {/* Submit Button */}
           <button
             type="submit"
