@@ -249,14 +249,15 @@ try {
   return (
     <div className="flex justify-center items-start w-full min-h-screen bg-gray-100 p-6">
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-2xl">
-        <Link href="/HomePage/" className="text-blue-500 hover:underline">
-          Home
-        </Link>
-
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
           {/* Broad Habitat */}
           <div>
-            <label className="text-gray-700 mb-2 block">Broad Habitat</label>
+            <label
+              className="text-gray-700 mb-2 block"
+              data-cy="broad-habitat-dropdown"
+            >
+              Broad Habitat
+            </label>
             <Select
               options={broadHabitatOptions}
               value={broadHabitat}
@@ -269,7 +270,12 @@ try {
           {/* Habitat Type */}
           {broadHabitat && (
             <div>
-              <label className="text-gray-700 mb-2 block">Habitat Type</label>
+              <label
+                className="text-gray-700 mb-2 block"
+                data-cy="habitat-type-dropdown"
+              >
+                Habitat Type
+              </label>
               <Select
                 options={habitatTypeOptions[broadHabitat.value]}
                 value={habitatType}
@@ -279,6 +285,7 @@ try {
                 }}
                 placeholder="Select Habitat Type"
                 className="text-gray-700"
+                data-cy="broad-habitat-selection"
               />
             </div>
           )}
@@ -334,7 +341,7 @@ try {
               <div>
                 <div className=" grid grid-cols-2">
                   <div>
-                    <label className="text-gray-500 mb-2">Condition</label>
+                    <h2 className="text-gray-500 mb-2">Condition</h2>
                     <input
                       value="Condition Assessment N/A"
                       className="w-11/12 text-center p-3 border border-gray-300 rounded-md focus:ring-2"
